@@ -18,7 +18,12 @@
 "\n"
 #/*  (GPLv2 is included near the bottom of the source file) */
 
-#define USAGE \
+#if defined(__unix__) || defined(__unix) || \
+	(defined(__APPLE__) && defined(__MACH__))
+#define UNIX_ENOUGH
+#endif
+
+#define USAGE_BASE \
 "Usage: onehttpd [OPTIONS]... DOCROOT                                       \n"\
 "Start a weberver with document root at DOCROOT                             \n"\
 "                                                                           \n"\
@@ -32,11 +37,15 @@
 "  -d       Run a dummy server that serves a static page instead of DOCROOT \n"\
 "  -u       Use 'charset=utf-8' in Content-Type for text files and listings.\n"\
 "                                                                           \n"\
-"Example: onehttpd.exe C:\\WWW         # Serve files in C:\\WWW on port 8080  \n"\
-"Example: onehttpd -p 8008 /var/www   # Serve files in /var/www on port 8008\n"\
-"                                                                           \n"\
-"HINT: In Windows, you can just drag and drop a directory onto onehttpd.exe \n"\
-"\n"
+
+#ifdef UNIX_ENOUGH
+#define USAGE USAGE_BASE \
+"Example: onehttpd -p 8008 /var/www   # Serve files in /var/www on port 8008\n\n"
+#else
+#define USAGE USAGE_BASE \
+"Example: onehttpd.exe C:\\WWW         # Serve files in C:\\WWW on port 8080  \n\n"\
+"HINT: In Windows, you can just drag and drop a directory onto onehttpd.exe \n\n"
+#endif
 
 #/* (Mis-)Features:
 # *
@@ -95,8 +104,15 @@ ONEHTTPD_VERSION_MINOR=8
 #define ONEHTTPD_VERSION_STRING_FULL "onehttpd/" ONEHTTPD_VERSION_STRING
 
 # /* This is the Makefile part
+ifeq ($(OS),Windows_NT)
+	CC=i586-mingw32msvc-gcc
+	TARGET=onehttpd.exe
+else
+	CC=gcc
+	TARGET=onehttpd
+endif
 
-all: onehttpd onehttpd.exe
+all: $(TARGET)
 
 # just need to consider distributing the win32 exe.
 dist: onehttpd.exe
@@ -320,6 +336,7 @@ enum result_t
 	FAIL_SYS,
 	CALL_AGAIN,
 	WOULD_BLOCK,
+	UNKNOWN_RESULT
 };
 
 enum http_method
@@ -1778,7 +1795,7 @@ enum result_t request_start_stream_file( struct Request *req, const char *path )
 
 enum result_t request_list_directory( struct Request *req, const char *path ) 
 {
-	enum result_t ret = UNKNOWN;
+	enum result_t ret = UNKNOWN_RESULT;
 	char *decoded_path;
 	const char *filename;
 	dir_t *dir;
