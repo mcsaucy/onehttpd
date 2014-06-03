@@ -1,0 +1,6 @@
+Makefile
+*.swp
+*.exe
+*.o
+*.res
+*.ico
