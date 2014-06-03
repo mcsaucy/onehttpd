@@ -4,3 +4,4 @@ Makefile
 *.o
 *.res
 *.ico
+*.dSYM
