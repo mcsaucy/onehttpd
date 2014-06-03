@@ -25,7 +25,7 @@
 
 #define USAGE_BASE \
 "Usage: onehttpd [OPTIONS]... DOCROOT                                       \n"\
-"Start a weberver with document root at DOCROOT                             \n"\
+"Start a webserver with document root at DOCROOT                             \n"\
 "                                                                           \n"\
 "  -G       Displays legal notices on copyrights, disclaimers, etc.         \n"\
 "  -l       Disable directory listings (enabled by default)                 \n"\
